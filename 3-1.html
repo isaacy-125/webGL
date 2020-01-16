@@ -19,8 +19,103 @@
 <body onload="threeStart();">
     <div id="canvas-frame"></div>
     <script src="three.min.js"></script>
+<!--    目前性能监控为新包 需要下载-->
+    <script src="Stats.js"></script>
+<!--    动画引擎库-->
+    <script src="tween.js"></script>
     <script>
+        var renderer;
+        var stats;
+        // 初始化渲染器
+        function initThree() {
+            width = document.getElementById('canvas-frame').clientWidth;
+            height = document.getElementById('canvas-frame').clientHeight;
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
+            renderer.setSize(width, height);
+            document.getElementById('canvas-frame').appendChild(renderer.domElement);
+            renderer.setClearColor(0xFFFFFF, 1.0);
 
+            // 初始化Stats用于性能监测
+            stats = new this.Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+            document.getElementById('canvas-frame').appendChild(stats.domElement);
+        }
+
+        var camera;
+        // 初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, width/height, 1, 10000);
+            camera.position.x = 0;
+            camera.position.y = 0;
+            camera.position.z = 600;
+            camera.up.x = 0;
+            camera.up.y = 1;
+            camera.up.z = 0;
+            camera.lookAt(0,0,0);
+        }
+
+        var scene;
+        // 初始化场景
+        function initScene() {
+            scene = new THREE.Scene();
+        }
+
+        var light;
+        // 初始化光线  目前不明白
+        function initLight() {
+            light = new THREE.AmbientLight(0xFFFFFF);
+            light.position.set(100, 100, 200);
+            scene.add(light);
+            light = new THREE.PointLight(0x00FF00);
+            light.position.set(0, 0,300);
+            scene.add(light);
+        }
+
+        var cube;
+        var mesh;
+        // 这里初始化一个几何体 具体语法 可以后面再考虑
+        function initObject() {
+            var geometry = new THREE.CylinderGeometry(100, 150, 400);
+            var material = new THREE.MeshLambertMaterial({color: 0xFFFF00});
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.position = new THREE.Vector3(0, 0, 0);
+            scene.add(mesh);
+        }
+
+        // 初始化动画
+        function initTween() {
+            // 表示将mesh的x移动到-400 3000毫秒的时间 无限循环
+            new TWEEN.Tween(mesh.position)
+                .to({x: -400}, 3000).repeat(Infinity).start()
+        }
+
+        // 这里是循环渲染 更新x轴
+        function animation() {
+            // 这里动起来 是将摄像机移动 像右侧移动 则看到的物体是向左侧移动
+            // camera.position.x = camera.position.x + 0.5;
+            // 这里是让屋里像左侧移动
+            // mesh.position.x-=1;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animation);
+            // 更新性能检测器
+            //FPS越高 说明一秒内渲染次数越多越好
+            stats.update();
+            TWEEN.update();
+        }
+
+        function threeStart() {
+            initThree();
+            initCamera();
+            initScene();
+            initLight();
+            initObject();
+            initTween();
+            animation();
+        }
     </script>
 </body>
 </html>
