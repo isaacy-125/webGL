@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        div#canvas-frame {
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            height: 600px;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+<body>
+    <body onload="threeStart()">
+        <div id="canvas-frame"></div>
+    </body>
+    <script src="three.min.js"></script>
+    <script>
+        var renderer;
+        // 初始化渲染器
+        function initThree() {
+            width = document.getElementById('canvas-frame').clientWidth;
+            height = document.getElementById('canvas-frame').clientHeight;
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
+            renderer.setSize(width, height);
+            document.getElementById('canvas-frame').appendChild(renderer.domElement);
+            // 目前理解为设置背景色
+            renderer.setClearColor(0xFFFFFF, 1.0);
+        }
+        var camera;
+        // 初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, width/height, 1, 10000)
+            camera.position.x = 600;
+            camera.position.y = 0;
+            camera.position.z = 600;
+            camera.up.x = 0;
+            camera.up.y = 1;
+            camera.up.z = 0;
+            camera.lookAt({
+                x: 0,
+                y: 0,
+                z: 0,
+            })
+        }
+        var scene;
+        // 初始化场景
+        function initScene() {
+            scene = new THREE.Scene();
+        }
+        var light;
+        // 初始化光源
+        function initLight() {
+            light = new THREE.AmbientLight(0xFF0000);
+            light.position.set(100, 100, 200);
+            scene.add(light);
+        }
+        var cube;
+        // 初始化物体
+        function initObject() {
+            // 立方体 其实是长方体
+            /*width：x方向上的长度
+
+            height：y方向上的长度
+
+            depth：z方向上的长度
+
+            widthSegments：x方向上的分段数（可选，缺省值1）
+
+        　　heightSegments：y方向上的分段数（同上）
+
+        　　depthSegments：z方向上的分段数（同上*/
+            var geometry = new THREE.CubeGeometry(200, 100, 50, 4, 4);
+            //这种材质可以用来创建暗淡的并不光亮的表面。
+            /*无光泽表面的材质，无镜面高光。
+                这可以很好地模拟一些表面（如未经处理的木材或石头），但不能用镜面高光（如上漆木材）模拟光泽表面。
+            该材质非常易用，而且会对场景中的光源产生反应。*/
+            var material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+            // 初步认识 这是一个网格对象
+            var mesh = new THREE.Mesh( geometry,material);
+            mesh.position = new THREE.Vector3(0,0,0);
+            scene.add(mesh);
+        }
+        function threeStart() {
+            initThree();
+            initCamera();
+            initScene();
+            initLight();
+            initObject();
+            renderer.clear();
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
